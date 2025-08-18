@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { URL } from 'url';
 
 @Injectable()
 export class CloudProvidersMetaData {
@@ -252,6 +253,24 @@ export class CloudProvidersMetaData {
   }
 
   async get(providerUrl: string): Promise<string> {
+    // Validate URL
+    let url;
+    try {
+      url = new URL(providerUrl);
+    } catch (err) {
+      throw new Error(`Invalid URL: ${providerUrl}`);
+    }
+
+    // Check against allowed hosts
+    const allowedHosts = [
+      'metadata.google.internal',
+      '169.254.169.254'
+    ];
+
+    if (!allowedHosts.includes(url.hostname)) {
+      throw new Error(`Access to the host '${url.hostname}' is not allowed`);
+    }
+
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);
     } else if (providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN)) {
