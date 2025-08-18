@@ -90,7 +90,16 @@ ${xmlNodes.join('\n')}
     return this.getFormattedXMLOutput(xmlNodes);
   }
 
-  private sanitizeXpath(xpathExpression: string): string {
+  getPartnersPropertiesWithParams(xpathExpression: string, params: { [key: string]: string }): string {
+    const partnersXMLObj = this.getPartnersXMLObj();
+    const variables = Object.keys(params).map(key => `declare variable $${key} as xs:string external;`).join(' ');
+    const fullExpression = `${variables} ${xpathExpression}`;
+    const context = { variables: params };
+    const xmlNodes = xpath.evaluate(fullExpression, partnersXMLObj, null, xpath.XPathResult.ANY_TYPE, context);
+    return this.getFormattedXMLOutput(xmlNodes);
+  }
+
+  sanitizeXpath(xpathExpression: string): string {
     // Basic sanitization logic to escape single quotes
     return xpathExpression.replace(/'/g, "\'");
   }
