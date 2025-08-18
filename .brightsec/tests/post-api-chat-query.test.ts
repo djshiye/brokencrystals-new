@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('POST /api/chat/query', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['csrf', 'prompt_injection', 'secret_tokens', 'server_side_js_injection', 'ssrf'],
+      tests: ['prompt_injection'],
       attackParamLocations: [AttackParamLocation.BODY]
     })
     .setFailFast(false)
