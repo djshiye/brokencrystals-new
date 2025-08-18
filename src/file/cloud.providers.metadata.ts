@@ -271,6 +271,28 @@ export class CloudProvidersMetaData {
       throw new Error(`Access to the host '${url.hostname}' is not allowed`);
     }
 
+    // Check for path traversal
+    if (url.pathname.includes('..')) {
+      throw new Error('Path traversal detected');
+    }
+
+    // Check for allowed paths
+    const allowedPaths = [
+      '/computeMetadata/v1/',
+      '/metadata/instance',
+      '/metadata/v1',
+      '/latest/meta-data/'
+    ];
+
+    if (!allowedPaths.some(allowedPath => url.pathname.startsWith(allowedPath))) {
+      throw new Error(`Access to the path '${url.pathname}' is not allowed`);
+    }
+
+    // Ensure the URL is HTTPS
+    if (url.protocol !== 'https:') {
+      throw new Error('Only HTTPS protocol is allowed for external requests');
+    }
+
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);
     } else if (providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN)) {

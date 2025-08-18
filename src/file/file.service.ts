@@ -54,6 +54,11 @@ export class FileService {
         throw new Error(`Access to the path '${url.pathname}' is not allowed`);
       }
 
+      // Ensure the URL is HTTPS
+      if (url.protocol !== 'https:') {
+        throw new Error('Only HTTPS protocol is allowed for external requests');
+      }
+
       const content = await this.cloudProviders.get(file);
 
       if (content) {

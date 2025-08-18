@@ -43,6 +43,7 @@ export class ChatController {
 
   // Sanitize input to prevent prompt injection
   private sanitizeInput(input: string): string {
-    return input.replace(/[^\w\s]/gi, ''); // Remove any non-alphanumeric characters
+    // Remove any non-alphanumeric characters and limit length
+    return input.replace(/[^\\w\s]/gi, '').substring(0, 200); 
   }
 }
