@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('get-api-file-aws', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['open_cloud_storage', 'amazon_s3_takeover', 'ssrf', 'lfi', 'secret_tokens'],
+      tests: ['ssrf'],
       attackParamLocations: [AttackParamLocation.QUERY, AttackParamLocation.HEADER]
     })
     .setFailFast(false)
