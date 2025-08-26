@@ -80,6 +80,7 @@ export class AppController {
       this.logger.debug(`Rendered template: ${res}`);
       return res;
     }
+    throw new HttpException('Invalid input type', HttpStatus.BAD_REQUEST);
   }
 
   @Get('goto')
