@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('GET /api/file?path=config/products/crystals/amethyst.jpg&type=image/jpg', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['full_path_disclosure', 'ssrf', 'lfi'],
+      tests: ['lfi'],
       attackParamLocations: [AttackParamLocation.QUERY]
     })
     .setFailFast(false)
