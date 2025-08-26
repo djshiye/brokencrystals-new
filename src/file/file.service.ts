@@ -15,60 +15,14 @@ export class FileService {
     this.logger.log(`Reading file: ${file}`);
 
     // Validate and sanitize the file path
-    if (file.includes('..')) {
+    if (file.includes('..') || path.isAbsolute(file)) {
       throw new Error('Invalid file path');
     }
 
-    if (file.startsWith('/')) {
-      const safePath = path.resolve('/', file);
-      await fs.promises.access(safePath, R_OK);
+    const safePath = path.resolve(process.cwd(), file);
+    await fs.promises.access(safePath, R_OK);
 
-      return fs.createReadStream(safePath);
-    } else if (file.startsWith('http')) {
-      // Validate URL
-      let url;
-      try {
-        url = new URL(file);
-      } catch (err) {
-        throw new Error('Invalid URL');
-      }
-
-      // Check against allowed hosts
-      const allowedHosts = [
-        'example.com', // Replace with actual allowed hosts
-        'another-example.com'
-      ];
-
-      if (!allowedHosts.includes(url.hostname)) {
-        throw new Error('Host not allowed');
-      }
-
-      // Ensure the path is not accessing metadata endpoints
-      const forbiddenPaths = [
-        '/metadata/',
-        '/latest/meta-data/',
-        '/computeMetadata/v1/',
-        '/metadata/instance',
-        '/metadata/v1'
-      ];
-
-      if (forbiddenPaths.some(path => url.pathname.startsWith(path))) {
-        throw new Error('Access to metadata endpoints is forbidden');
-      }
-
-      const content = await this.cloudProviders.get(file);
-
-      if (content) {
-        return Readable.from(content);
-      } else {
-        throw new Error(`no such file or directory, access '${file}'`);
-      }
-    } else {
-      const safePath = path.resolve(process.cwd(), file);
-      await fs.promises.access(safePath, R_OK);
-
-      return fs.createReadStream(safePath);
-    }
+    return fs.createReadStream(safePath);
   }
 
   async deleteFile(file: string): Promise<boolean> {
