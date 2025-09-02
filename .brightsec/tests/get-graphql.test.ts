@@ -1,3 +1,4 @@
+```
 import { test, before, after } from 'node:test';
 import { SecRunner } from '@sectester/runner';
 import { AttackParamLocation, HttpMethod } from '@sectester/scan';
@@ -32,3 +33,5 @@ test('GET /graphql', { signal: AbortSignal.timeout(timeout) }, async () => {
       url: `${baseUrl}/graphql?query={test}`
     });
 });
+
+```
