@@ -46,6 +46,10 @@ export class PartnersController {
     this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
 
     try {
+      // Sanitize the xpath input to prevent injection
+      if (!this.isValidXPath(xpath)) {
+        throw new HttpException('Invalid XPath expression', HttpStatus.BAD_REQUEST);
+      }
       return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
       throw new HttpException(
@@ -85,6 +89,11 @@ export class PartnersController {
     );
 
     try {
+      // Sanitize inputs to prevent XPath injection
+      if (!this.isValidInput(username) || !this.isValidInput(password)) {
+        throw new HttpException('Invalid input', HttpStatus.BAD_REQUEST);
+      }
+
       const xpath = `//partners/partner[username/text()='${username}' and password/text()='${password}']/*`;
       const xmlStr = this.partnersService.getPartnersProperties(xpath);
 
@@ -128,6 +137,11 @@ export class PartnersController {
     this.logger.debug(`Searching partner names by the keyword "${keyword}"`);
 
     try {
+      // Sanitize the keyword input to prevent injection
+      if (!this.isValidInput(keyword)) {
+        throw new HttpException('Invalid input', HttpStatus.BAD_REQUEST);
+      }
+
       const xpath = `//partners/partner/name[contains(., '${keyword}')]`;
       return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
@@ -143,5 +157,17 @@ export class PartnersController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  private isValidXPath(xpath: string): boolean {
+    // Implement a basic check for valid XPath expressions
+    // This is a placeholder for actual validation logic
+    return /^[a-zA-Z0-9\/\[\]\@\=\'\-\s]+$/.test(xpath);
+  }
+
+  private isValidInput(input: string): boolean {
+    // Implement a basic check for valid input
+    // This is a placeholder for actual validation logic
+    return /^[a-zA-Z0-9]+$/.test(input);
   }
 }
