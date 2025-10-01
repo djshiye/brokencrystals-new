@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { HeadersConfiguratorInterceptor } from './components/headers.configurator.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import fastifyCookie from '@fastify/cookie';
-import session from '@fastify/session';
+session from '@fastify/session';
 import { GlobalExceptionFilter } from './components/global-exception.filter';
 import * as os from 'os';
 import { readFileSync, readFile, readdirSync } from 'fs';
