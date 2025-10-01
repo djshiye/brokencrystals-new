@@ -42,7 +42,9 @@ export class ChatController {
   }
 
   private sanitizeContent(content: string): string {
-    // Basic sanitization logic to remove potentially harmful content
-    return content.replace(/\b(?:napalm|explosive|bomb)\b/gi, '[redacted]');
+    // Enhanced sanitization logic to remove potentially harmful content
+    const forbiddenWords = ['napalm', 'explosive', 'bomb', 'attack', 'weapon'];
+    const regex = new RegExp(`\\b(?:${forbiddenWords.join('|')})\\b`, 'gi');
+    return content.replace(regex, '[redacted]');
   }
 }
