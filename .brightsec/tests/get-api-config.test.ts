@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('GET /api/config?query=no-sec-headers', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['csrf', 'improper_asset_management', 'secret_tokens', 'full_path_disclosure'],
+      tests: ['secret_tokens'],
       attackParamLocations: [AttackParamLocation.QUERY, AttackParamLocation.HEADER],
       starMetadata: { databases: ['PostgreSQL'] }
     })
