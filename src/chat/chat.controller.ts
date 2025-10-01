@@ -43,7 +43,8 @@ export class ChatController {
   }
 
   private sanitizeContent(content: string): string {
-    // Basic sanitization logic to prevent prompt injection
-    return content.replace(/[^\w\s.,!?]/g, '');
+    // Enhanced sanitization logic to prevent prompt injection
+    // Remove potentially harmful characters and patterns
+    return content.replace(/[{}<>$]/g, '').replace(/\s+/g, ' ').trim();
   }
 }
