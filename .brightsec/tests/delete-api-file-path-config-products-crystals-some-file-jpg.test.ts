@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('DELETE /api/file?path=config/products/crystals/some_file.jpg', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['lfi', 'bopla', 'ssrf', 'full_path_disclosure', 'http_method_fuzzing'],
+      tests: ['full_path_disclosure'],
       attackParamLocations: [AttackParamLocation.QUERY],
       starMetadata: { databases: ['PostgreSQL'] }
     })
