@@ -70,13 +70,12 @@ export class PartnersService {
     return `${this.XML_HEADER}\n<root>\n${xmlNodes.join('\n')}\n</root>`;
   }
 
-  getPartnersProperties(xpathExpression: string): string {
-    // Validate and sanitize the XPath expression to prevent injection
-    if (!/^[a-zA-Z0-9\/\[\]\(\)\@\=\'\s]+$/.test(xpathExpression)) {
-      this.logger.warn('Invalid characters detected in XPath expression');
-      throw new Error('Invalid XPath expression');
-    }
+  getPartnersProperties(username: string, password: string): string {
+    // Sanitize inputs to prevent XPath Injection
+    const sanitizedUsername = username.replace(/'/g, "&apos;");
+    const sanitizedPassword = password.replace(/'/g, "&apos;");
 
+    const xpathExpression = `//partners/partner[username/text()='${sanitizedUsername}' and password/text()='${sanitizedPassword}']/*`;
     let xmlNodes = this.selectPartnerPropertiesByXPATH(xpathExpression);
 
     if (!Array.isArray(xmlNodes)) {

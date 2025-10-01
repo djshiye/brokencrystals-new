@@ -20,10 +20,9 @@ export class FileService {
     }
 
     if (file.startsWith('/')) {
-      const safePath = path.join(process.cwd(), 'safe_directory', file);
-      await fs.promises.access(safePath, R_OK);
+      await fs.promises.access(file, R_OK);
 
-      return fs.createReadStream(safePath);
+      return fs.createReadStream(file);
     } else if (file.startsWith('http')) {
       // Validate URL
       let url;
@@ -46,10 +45,11 @@ export class FileService {
         throw new Error(`no such file or directory, access '${file}'`);
       }
     } else {
-      const safePath = path.join(process.cwd(), 'safe_directory', file);
-      await fs.promises.access(safePath, R_OK);
+      file = path.resolve(process.cwd(), file);
 
-      return fs.createReadStream(safePath);
+      await fs.promises.access(file, R_OK);
+
+      return fs.createReadStream(file);
     }
   }
 
@@ -74,9 +74,14 @@ export class FileService {
     } else if (file.startsWith('http')) {
       throw new Error('cannot delete file from this location');
     } else {
-      const safePath = path.join(process.cwd(), 'safe_directory', file);
-      await fs.promises.unlink(safePath);
-      return true;
+      file = path.resolve(process.cwd(), file);
+      try {
+        await fs.promises.unlink(file);
+        return true;
+      } catch (err) {
+        this.logger.error(err.message);
+        throw new Error('An error occurred while deleting the file.');
+      }
     }
   }
 }
