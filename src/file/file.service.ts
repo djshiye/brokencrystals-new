@@ -19,17 +19,6 @@ export class FileService {
       throw new Error('Invalid file path');
     }
 
-    // Check if the file is a valid URL
-    try {
-      const url = new URL(file);
-      if (!['http:', 'https:'].includes(url.protocol)) {
-        throw new Error('Invalid URL protocol');
-      }
-      // Additional URL validation can be added here
-    } catch (err) {
-      throw new Error('Invalid URL');
-    }
-
     const resolvedPath = path.resolve(process.cwd(), file);
     await fs.promises.access(resolvedPath, R_OK);
 
