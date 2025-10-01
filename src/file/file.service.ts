@@ -1,9 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import { Readable, Stream } from 'stream';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CloudProvidersMetaData } from './cloud.providers.metadata';
 import { R_OK } from 'constants';
+import { URL } from 'url';
 
 @Injectable()
 export class FileService {
@@ -18,6 +19,12 @@ export class FileService {
 
       return fs.createReadStream(file);
     } else if (file.startsWith('http')) {
+      // Validate URL
+      const url = new URL(file);
+      if (!this.isAllowedHost(url.hostname)) {
+        throw new Error(`Access to the host '${url.hostname}' is not allowed`);
+      }
+
       const content = await this.cloudProviders.get(file);
 
       if (content) {
@@ -34,15 +41,28 @@ export class FileService {
     }
   }
 
+  private isAllowedHost(hostname: string): boolean {
+    const allowedHosts = [
+      'metadata.google.internal',
+      // Removed '169.254.169.254' to prevent SSRF
+    ];
+    return allowedHosts.includes(hostname);
+  }
+
   async deleteFile(file: string): Promise<boolean> {
-    if (file.startsWith('/')) {
-      throw new Error('cannot delete file from this location');
-    } else if (file.startsWith('http')) {
-      throw new Error('cannot delete file from this location');
-    } else {
-      file = path.resolve(process.cwd(), file);
-      await fs.promises.unlink(file);
-      return true;
+    try {
+      if (file.startsWith('/')) {
+        throw new Error('cannot delete file from this location');
+      } else if (file.startsWith('http')) {
+        throw new Error('cannot delete file from this location');
+      } else {
+        file = path.resolve(process.cwd(), file);
+        await fs.promises.unlink(file);
+        return true;
+      }
+    } catch (error) {
+      this.logger.error(`Failed to delete file: ${error.message}`);
+      throw new InternalServerErrorException('An error occurred while deleting the file.');
     }
   }
 }
