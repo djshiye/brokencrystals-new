@@ -59,7 +59,7 @@ export class TestimonialsResolver {
         )
       );
     } catch {
-      throw InternalServerErrorException;
+      throw new InternalServerErrorException('Failed to create testimonial');
     }
   }
 }
