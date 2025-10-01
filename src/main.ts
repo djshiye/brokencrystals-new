@@ -233,6 +233,19 @@ async function bootstrap() {
 
   SwaggerModule.setup('swagger', app, document);
 
+  // Disable GraphQL introspection in production
+  if (process.env.NODE_ENV === 'production') {
+    app.useGlobalInterceptors({
+      intercept(context, next) {
+        const request = context.switchToHttp().getRequest();
+        if (request.body && request.body.query && request.body.query.includes('__schema')) {
+          throw new Error('Introspection is disabled');
+        }
+        return next.handle();
+      }
+    });
+  }
+
   await app.listen(3000, '0.0.0.0');
 }
 
