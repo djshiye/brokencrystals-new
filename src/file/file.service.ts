@@ -59,7 +59,18 @@ export class FileService {
       'metadata.google.internal',
       '169.254.169.254'
     ];
+    // Ensure the URL is not a private IP address
+    const privateIpRegex = /^(10|127|169\.254|192\.168|172\.(1[6-9]|2[0-9]|3[0-1]))\./;
+    if (privateIpRegex.test(url.hostname) || this.isPrivateIp(url.hostname)) {
+      return false;
+    }
     return allowedHosts.includes(url.hostname);
+  }
+
+  private isPrivateIp(hostname: string): boolean {
+    // Check if the hostname is a private IP address
+    const privateIpRegex = /^(10|127|169\.254|192\.168|172\.(1[6-9]|2[0-9]|3[0-1]))\./;
+    return privateIpRegex.test(hostname);
   }
 
   private isValidPath(filePath: string): boolean {
@@ -75,13 +86,8 @@ export class FileService {
       throw new Error('cannot delete file from this location');
     } else {
       file = path.resolve(process.cwd(), file);
-      try {
-        await fs.promises.unlink(file);
-        return true;
-      } catch (err) {
-        this.logger.error(err.message);
-        throw new Error('An error occurred while deleting the file.');
-      }
+      await fs.promises.unlink(file);
+      return true;
     }
   }
 }
