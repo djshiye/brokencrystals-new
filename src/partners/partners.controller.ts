@@ -151,11 +151,11 @@ export class PartnersController {
 
   private sanitizeInput(input: string): string {
     // Basic sanitization logic to escape single quotes
-    return input.replace(/'/g, "\'");
+    return input.replace(/'/g, "&apos;");
   }
 
   private sanitizeXpath(xpathExpression: string): string {
     // Basic sanitization logic to escape single quotes
-    return xpathExpression.replace(/'/g, "\'");
+    return xpathExpression.replace(/'/g, "&apos;");
   }
 }

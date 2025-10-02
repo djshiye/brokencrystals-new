@@ -37,7 +37,7 @@ import { ChatModule } from './chat/chat.module';
       driver: MercuriusDriver,
       graphiql: false, // Disable GraphiQL
       autoSchemaFile: true,
-      introspection: false // Disable introspection
+      introspection: process.env.NODE_ENV !== 'production' // Disable introspection in production
     }),
     PartnersModule,
     EmailModule,
