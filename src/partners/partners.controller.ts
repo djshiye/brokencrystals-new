@@ -46,7 +46,8 @@ export class PartnersController {
     this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
 
     try {
-      return this.partnersService.getPartnersProperties(xpath);
+      const sanitizedXpath = this.sanitizeXpath(xpath);
+      return this.partnersService.getPartnersProperties(sanitizedXpath);
     } catch (err) {
       throw new HttpException(
         `Failed to load XML using XPATH. Details: ${err}`,
@@ -85,7 +86,9 @@ export class PartnersController {
     );
 
     try {
-      const xpath = `//partners/partner[username/text()='${username}' and password/text()='${password}']/*`;
+      const sanitizedUsername = this.sanitizeInput(username);
+      const sanitizedPassword = this.sanitizeInput(password);
+      const xpath = `//partners/partner[username/text()='${sanitizedUsername}' and password/text()='${sanitizedPassword}']/*`;
       const xmlStr = this.partnersService.getPartnersProperties(xpath);
 
       // Check if account's data contains any information - If not, the login failed!
@@ -149,5 +152,10 @@ export class PartnersController {
   private sanitizeInput(input: string): string {
     // Basic sanitization logic to escape single quotes
     return input.replace(/'/g, "\'");
+  }
+
+  private sanitizeXpath(xpathExpression: string): string {
+    // Basic sanitization logic to escape single quotes
+    return xpathExpression.replace(/'/g, "\'");
   }
 }
