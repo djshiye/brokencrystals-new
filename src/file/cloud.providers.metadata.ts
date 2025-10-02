@@ -268,19 +268,6 @@ export class CloudProvidersMetaData {
       throw new Error('Access to the specified URL is not allowed');
     }
 
-    // Ensure the path is within the allowed metadata paths
-    const baseUrl = providerUrl.split('?')[0];
-    const allowedPaths = this.providers.get(baseUrl);
-    if (!allowedPaths || !providerUrl.startsWith(baseUrl)) {
-      throw new Error('Access to the specified path is not allowed');
-    }
-
-    // Check if the path is within the allowed paths
-    const path = providerUrl.replace(baseUrl, '');
-    if (!allowedPaths.split('\n').some(allowedPath => path.startsWith(allowedPath.trim()))) {
-      throw new Error('Access to the specified path is not allowed');
-    }
-
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);
     } else if (providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN)) {
