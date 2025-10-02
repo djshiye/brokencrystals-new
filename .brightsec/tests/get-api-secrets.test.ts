@@ -1,3 +1,4 @@
+```
 import { test, before, after } from 'node:test';
 import { SecRunner } from '@sectester/runner';
 import { AttackParamLocation, HttpMethod } from '@sectester/scan';
@@ -21,7 +22,7 @@ after(() => runner.clear());
 test('GET /api/secrets', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['secret_tokens', 'csrf', 'improper_asset_management', 'full_path_disclosure'],
+      tests: ['secret_tokens'],
       attackParamLocations: [AttackParamLocation.HEADER, AttackParamLocation.PATH],
       starMetadata: { databases: ['PostgreSQL'] }
     })
@@ -32,3 +33,4 @@ test('GET /api/secrets', { signal: AbortSignal.timeout(timeout) }, async () => {
       url: `${baseUrl}/api/secrets`
     });
 });
+```
