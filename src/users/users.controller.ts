@@ -135,10 +135,11 @@ export class UsersController {
       }
     }
   })
-  async getById(@Param('id') id: number): Promise<UserDto> {
+  async getById(@Param('id') id: number, @Req() req: FastifyRequest): Promise<UserDto> {
     try {
       this.logger.debug(`Find a user by id: ${id}`);
-      return new UserDto(await this.usersService.findById(id));
+      const requestingUserId = this.extractUserIdFromRequest(req);
+      return new UserDto(await this.usersService.findById(id, requestingUserId));
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }

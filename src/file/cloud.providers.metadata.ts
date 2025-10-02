@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { URL } from 'url';
 
 @Injectable()
 export class CloudProvidersMetaData {
@@ -252,6 +253,34 @@ export class CloudProvidersMetaData {
   }
 
   async get(providerUrl: string): Promise<string> {
+    const url = new URL(providerUrl);
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      throw new Error('Invalid URL protocol');
+    }
+
+    // Validate the URL against known cloud provider metadata URLs
+    if (
+      !providerUrl.startsWith(CloudProvidersMetaData.GOOGLE) &&
+      !providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN) &&
+      !providerUrl.startsWith(CloudProvidersMetaData.AWS) &&
+      !providerUrl.startsWith(CloudProvidersMetaData.AZURE)
+    ) {
+      throw new Error('Access to the specified URL is not allowed');
+    }
+
+    // Ensure the path is within the allowed metadata paths
+    const baseUrl = providerUrl.split('?')[0];
+    const allowedPaths = this.providers.get(baseUrl);
+    if (!allowedPaths || !providerUrl.startsWith(baseUrl)) {
+      throw new Error('Access to the specified path is not allowed');
+    }
+
+    // Check if the path is within the allowed paths
+    const path = providerUrl.replace(baseUrl, '');
+    if (!allowedPaths.split('\n').some(allowedPath => path.startsWith(allowedPath.trim()))) {
+      throw new Error('Access to the specified path is not allowed');
+    }
+
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);
     } else if (providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN)) {
