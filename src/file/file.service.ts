@@ -25,6 +25,11 @@ export class FileService {
         throw new Error(`Access to the host '${url.hostname}' is not allowed`);
       }
 
+      // Ensure the URL path is valid and does not contain directory traversal
+      if (url.pathname.includes('..')) {
+        throw new Error('Invalid file path');
+      }
+
       const content = await this.cloudProviders.get(file);
 
       if (content) {
@@ -43,9 +48,7 @@ export class FileService {
 
   private isAllowedHost(hostname: string): boolean {
     const allowedHosts = [
-      'metadata.google.internal',
-      '169.254.169.254',
-      // Add other allowed hosts here
+      // Add only trusted hosts here
     ];
     return allowedHosts.includes(hostname);
   }
