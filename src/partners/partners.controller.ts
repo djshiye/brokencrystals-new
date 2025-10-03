@@ -46,6 +46,9 @@ export class PartnersController {
     this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
 
     try {
+      if (!this.partnersService.validateXPathInput(xpath)) {
+        throw new Error('Invalid XPath expression');
+      }
       const sanitizedXpath = this.partnersService.sanitizeInput(xpath);
       return this.partnersService.getPartnersProperties(sanitizedXpath);
     } catch (err) {

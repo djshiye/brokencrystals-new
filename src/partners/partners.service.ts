@@ -86,7 +86,12 @@ export class PartnersService {
   }
 
   sanitizeInput(input: string): string {
-    // Basic sanitization to escape single quotes
-    return input.replace(/'/g, "\'");
+    // Properly escape input to prevent XPath injection
+    return input.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+  }
+
+  validateXPathInput(input: string): boolean {
+    // Allow only alphanumeric characters and basic XPath operators
+    return /^[a-zA-Z0-9_\-\/\[\]\(\)\@\=\s]+$/.test(input);
   }
 }
