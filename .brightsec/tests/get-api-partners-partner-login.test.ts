@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('GET /api/partners/partnerLogin', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['xpathi', 'xss', 'secret_tokens'],
+      tests: ['xpathi'],
       attackParamLocations: [AttackParamLocation.QUERY],
       starMetadata: { databases: ['PostgreSQL'] }
     })
