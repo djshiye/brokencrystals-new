@@ -44,7 +44,7 @@ export class FileService {
   private isAllowedHost(hostname: string): boolean {
     const allowedHosts = [
       'metadata.google.internal',
-      // Removed '169.254.169.254' from allowed hosts
+      '169.254.169.254',
       // Add other allowed hosts here
     ];
     return allowedHosts.includes(hostname);
