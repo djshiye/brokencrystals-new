@@ -71,17 +71,22 @@ export class PartnersService {
   }
 
   getPartnersProperties(xpathExpression: string): string {
-    let xmlNodes = this.selectPartnerPropertiesByXPATH(xpathExpression);
+    const xmlNodes = this.selectPartnerPropertiesByXPATH(xpathExpression);
 
     if (!Array.isArray(xmlNodes)) {
       this.logger.debug(
         `xmlNodes's type wasn't 'Array', and it's value was: ${xmlNodes}`
       );
-      xmlNodes = [];
+      return this.getFormattedXMLOutput([]);
     } else {
       this.logger.debug(`Raw xpath xmlNodes value is: ${xmlNodes}`);
     }
 
     return this.getFormattedXMLOutput(xmlNodes);
+  }
+
+  sanitizeInput(input: string): string {
+    // Basic sanitization to escape single quotes
+    return input.replace(/'/g, "\'");
   }
 }
