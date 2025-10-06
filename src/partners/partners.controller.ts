@@ -46,7 +46,8 @@ export class PartnersController {
     this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
 
     try {
-      return this.partnersService.getPartnersProperties(xpath);
+      const sanitizedXpath = this.sanitizeXpath(xpath);
+      return this.partnersService.getPartnersProperties(sanitizedXpath);
     } catch (err) {
       throw new HttpException(
         `Failed to load XML using XPATH. Details: ${err}`,
@@ -85,17 +86,7 @@ export class PartnersController {
     );
 
     try {
-      const xpath = `//partners/partner[username/text()='${username}' and password/text()='${password}']/*`;
-      const xmlStr = this.partnersService.getPartnersProperties(xpath);
-
-      // Check if account's data contains any information - If not, the login failed!
-      if (
-        !(xmlStr && xmlStr.includes('password') && xmlStr.includes('wealth'))
-      ) {
-        throw new Error('Login attempt failed!');
-      }
-
-      return xmlStr;
+      return this.partnersService.getPartnersProperties(username, password);
     } catch (err) {
       const errStr = err.toString();
       const errorMessage = errStr.includes('Unterminated string literal')
@@ -128,7 +119,8 @@ export class PartnersController {
     this.logger.debug(`Searching partner names by the keyword "${keyword}"`);
 
     try {
-      const xpath = `//partners/partner/name[contains(., '${keyword}')]`;
+      const sanitizedKeyword = this.sanitizeInput(keyword);
+      const xpath = `//partners/partner/name[contains(., '${sanitizedKeyword}')]`;
       return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
       const errStr = err.toString();
@@ -143,5 +135,16 @@ export class PartnersController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  private sanitizeXpath(xpath: string): string {
+    // Implement a basic sanitization for the XPath input
+    // This is a placeholder and should be replaced with a more robust solution
+    return xpath.replace(/['"\[\]\|]/g, '');
+  }
+
+  private sanitizeInput(input: string): string {
+    // Sanitize input to prevent XPath injection
+    return input.replace(/['"\[\]\|]/g, '');
   }
 }
