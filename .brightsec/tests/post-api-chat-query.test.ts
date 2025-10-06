@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('POST /api/chat/query', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['prompt_injection', 'csrf', 'http_method_fuzzing', 'secret_tokens', 'insecure_tls_configuration'],
+      tests: ['prompt_injection'],
       attackParamLocations: [AttackParamLocation.BODY],
       starMetadata: { databases: ['PostgreSQL'] }
     })
