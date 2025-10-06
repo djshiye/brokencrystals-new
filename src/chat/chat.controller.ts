@@ -42,8 +42,9 @@ export class ChatController {
     }
   }
 
-  // Simple sanitization method to prevent prompt injection
+  // Enhanced sanitization method to prevent prompt injection
   private sanitizeInput(input: string): string {
-    return input.replace(/[^\w\s.,!?]/g, ''); // Remove any special characters
+    // Remove any special characters and limit input length
+    return input.replace(/[^\\w\s.,!?]/g, '').substring(0, 500); 
   }
 }
