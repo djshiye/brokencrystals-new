@@ -34,8 +34,8 @@ export class FileService {
 
       // Check against allowed hosts
       const allowedHosts = [
-        'metadata.google.internal',
-        '169.254.169.254'
+        // 'metadata.google.internal',
+        // '169.254.169.254'
       ];
 
       if (!allowedHosts.includes(url.hostname)) {

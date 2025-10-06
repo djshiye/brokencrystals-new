@@ -71,9 +71,7 @@ export class AppController {
   async renderTemplate(@Body() raw): Promise<string> {
     if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
       const text = raw.toString().trim();
-      // Escape user input to prevent Server Side Template Injection
-      const escapedText = text.replace(/\{\{.*?\}\}/g, '');
-      const res = dotT.compile(escapedText)();
+      const res = dotT.compile(text)();
       this.logger.debug(`Rendered template: ${res}`);
       return res;
     }
@@ -116,8 +114,8 @@ export class AppController {
   @Header('content-type', 'text/xml')
   async xml(@Body() xml: string): Promise<string> {
     const xmlDoc = parseXml(decodeURIComponent(xml), {
-      noent: false, // Disable external entity expansion
-      dtdvalid: false, // Disable DTD validation
+      noent: true,
+      dtdvalid: true,
       recover: true
     });
     this.logger.debug(xmlDoc);
