@@ -46,8 +46,7 @@ export class PartnersController {
     this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
 
     try {
-      const sanitizedXpath = this.sanitizeXpath(xpath);
-      return this.partnersService.getPartnersProperties(sanitizedXpath);
+      return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
       throw new HttpException(
         `Failed to load XML using XPATH. Details: ${err}`,
@@ -119,8 +118,7 @@ export class PartnersController {
     this.logger.debug(`Searching partner names by the keyword "${keyword}"`);
 
     try {
-      const sanitizedKeyword = this.sanitizeInput(keyword);
-      const xpath = `//partners/partner/name[contains(., '${sanitizedKeyword}')]`;
+      const xpath = `//partners/partner/name[contains(., '${keyword}')]`;
       return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
       const errStr = err.toString();
@@ -135,16 +133,5 @@ export class PartnersController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
-  }
-
-  private sanitizeXpath(xpath: string): string {
-    // Implement a basic sanitization for the XPath input
-    // This is a placeholder and should be replaced with a more robust solution
-    return xpath.replace(/['"\[\]\|]/g, '');
-  }
-
-  private sanitizeInput(input: string): string {
-    // Sanitize input to prevent XPath injection
-    return input.replace(/['"\[\]\|]/g, '');
   }
 }

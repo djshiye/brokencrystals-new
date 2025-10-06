@@ -70,9 +70,11 @@ export class PartnersService {
     return `${this.XML_HEADER}\n<root>\n${xmlNodes.join('\n')}\n</root>`;
   }
 
-  getPartnersProperties(xpathExpression: string): string {
-    const sanitizedXpathExpression = this.sanitizeXpath(xpathExpression);
-    let xmlNodes = this.selectPartnerPropertiesByXPATH(sanitizedXpathExpression);
+  getPartnersProperties(username: string, password: string): string {
+    const sanitizedUsername = this.sanitizeInput(username);
+    const sanitizedPassword = this.sanitizeInput(password);
+    const xpathExpression = `//partners/partner[username/text()='${sanitizedUsername}' and password/text()='${sanitizedPassword}']/*`;
+    let xmlNodes = this.selectPartnerPropertiesByXPATH(xpathExpression);
 
     if (!Array.isArray(xmlNodes)) {
       this.logger.debug(
@@ -84,12 +86,6 @@ export class PartnersService {
     }
 
     return this.getFormattedXMLOutput(xmlNodes);
-  }
-
-  private sanitizeXpath(xpath: string): string {
-    // Implement a basic sanitization for the XPath input
-    // This is a placeholder and should be replaced with a more robust solution
-    return xpath.replace(/['"\[\]\|]/g, '');
   }
 
   private sanitizeInput(input: string): string {
