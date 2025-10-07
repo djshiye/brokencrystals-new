@@ -251,6 +251,21 @@ export class CloudProvidersMetaData {
     );
   }
 
+  getAllowedPaths(hostname: string): string[] {
+    switch (hostname) {
+      case new URL(CloudProvidersMetaData.GOOGLE).hostname:
+        return ['/computeMetadata/v1/'];
+      case new URL(CloudProvidersMetaData.AZURE).hostname:
+        return ['/metadata/instance'];
+      case new URL(CloudProvidersMetaData.DIGITAL_OCEAN).hostname:
+        return ['/metadata/v1', '/metadata/v1.json'];
+      case new URL(CloudProvidersMetaData.AWS).hostname:
+        return ['/latest/meta-data/'];
+      default:
+        return [];
+    }
+  }
+
   async get(providerUrl: string): Promise<string> {
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);

@@ -70,8 +70,11 @@ export class PartnersService {
     return `${this.XML_HEADER}\n<root>\n${xmlNodes.join('\n')}\n</root>`;
   }
 
-  getPartnersProperties(xpathExpression: string): string {
-    let xmlNodes = this.selectPartnerPropertiesByXPATH(xpathExpression);
+  getPartnersProperties(xpath: string): string {
+    // Sanitize the XPath expression to prevent injection
+    const sanitizedXpath = xpath.replace(/['"&<>]/g, '');
+
+    let xmlNodes = this.selectPartnerPropertiesByXPATH(sanitizedXpath);
 
     if (!Array.isArray(xmlNodes)) {
       this.logger.debug(
