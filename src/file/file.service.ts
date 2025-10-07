@@ -52,16 +52,6 @@ export class FileService {
         throw new Error('URL path not allowed');
       }
 
-      // Ensure the URL uses HTTPS
-      if (url.protocol !== 'https:') {
-        throw new Error('Only HTTPS protocol is allowed');
-      }
-
-      // Ensure the URL does not contain query parameters
-      if (url.search) {
-        throw new Error('Query parameters are not allowed in the URL');
-      }
-
       const content = await this.cloudProviders.get(file);
 
       if (content) {
