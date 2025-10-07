@@ -71,10 +71,13 @@ export class PartnersService {
   }
 
   getPartnersProperties(xpath: string): string {
-    // Sanitize the XPath expression to prevent injection
-    const sanitizedXpath = xpath.replace(/['"&<>]/g, '');
+    // Validate the XPath expression to prevent injection
+    if (!this.isValidXPath(xpath)) {
+      this.logger.error(`Invalid XPath expression: ${xpath}`);
+      throw new Error('Invalid XPath expression');
+    }
 
-    let xmlNodes = this.selectPartnerPropertiesByXPATH(sanitizedXpath);
+    let xmlNodes = this.selectPartnerPropertiesByXPATH(xpath);
 
     if (!Array.isArray(xmlNodes)) {
       this.logger.debug(
@@ -86,5 +89,16 @@ export class PartnersService {
     }
 
     return this.getFormattedXMLOutput(xmlNodes);
+  }
+
+  private isValidXPath(xpath: string): boolean {
+    // Basic validation logic for XPath
+    const invalidPatterns = [
+      /['"&<>]/, // disallow quotes and special characters
+      /\|/, // disallow union operator
+      /\b(?:or|and)\b/i // disallow logical operators
+    ];
+
+    return !invalidPatterns.some((pattern) => pattern.test(xpath));
   }
 }
