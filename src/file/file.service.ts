@@ -15,35 +15,15 @@ export class FileService {
     this.logger.log(`Reading file: ${file}`);
 
     // Validate the file path to prevent directory traversal
-    if (file.includes('..')) {
+    if (file.includes('..') || path.isAbsolute(file)) {
       throw new Error('Invalid file path');
     }
 
-    if (file.startsWith('/')) {
-      await fs.promises.access(file, R_OK);
+    file = path.resolve(process.cwd(), file);
 
-      return fs.createReadStream(file);
-    } else if (file.startsWith('http')) {
-      // Validate URL
-      const url = new URL(file);
-      if (!this.isAllowedHost(url.hostname)) {
-        throw new Error(`Access to the host '${url.hostname}' is not allowed`);
-      }
+    await fs.promises.access(file, R_OK);
 
-      const content = await this.cloudProviders.get(file);
-
-      if (content) {
-        return Readable.from(content);
-      } else {
-        throw new Error(`no such file or directory, access '${file}'`);
-      }
-    } else {
-      file = path.resolve(process.cwd(), file);
-
-      await fs.promises.access(file, R_OK);
-
-      return fs.createReadStream(file);
-    }
+    return fs.createReadStream(file);
   }
 
   private isAllowedHost(hostname: string): boolean {

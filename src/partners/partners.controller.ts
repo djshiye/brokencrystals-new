@@ -46,9 +46,7 @@ export class PartnersController {
     this.logger.debug(`Getting partners with xpath expression "${xpath}"`);
 
     try {
-      // Sanitize the xpath input to prevent injection
-      const sanitizedXpath = xpath.replace(/'/g, "&apos;");
-      return this.partnersService.getPartnersProperties(sanitizedXpath);
+      return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
       throw new HttpException(
         `Failed to load XML using XPATH. Details: ${err}`,
@@ -134,9 +132,7 @@ export class PartnersController {
     this.logger.debug(`Searching partner names by the keyword "${keyword}"`);
 
     try {
-      // Sanitize the keyword input to prevent injection
-      const sanitizedKeyword = keyword.replace(/'/g, "&apos;");
-      const xpath = `//partners/partner/name[contains(., '${sanitizedKeyword}')]`;
+      const xpath = `//partners/partner/name[contains(., '${keyword}')]`;
       return this.partnersService.getPartnersProperties(xpath);
     } catch (err) {
       const errStr = err.toString();
