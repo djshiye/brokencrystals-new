@@ -228,6 +228,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addServer(process.env.URL)
+    .setDisableIntrospection()
     .build();
   const document = SwaggerModule.createDocument(app, options);
 

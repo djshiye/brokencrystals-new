@@ -57,9 +57,8 @@ export class TestimonialsService {
   async count(query: string): Promise<number> {
     try {
       this.logger.debug(`Executing count query`);
-      // Use parameterized query to prevent SQL injection
-      const result = await this.em.getConnection().execute('select count(*) as count from testimonial');
-      return result[0].count as number;
+
+      return (await this.em.getConnection().execute(query))[0].count as number;
     } catch (err) {
       this.logger.warn(`Failed to execute query. Error: ${err.message}`);
       throw new InternalServerErrorException('Failed to retrieve count.');

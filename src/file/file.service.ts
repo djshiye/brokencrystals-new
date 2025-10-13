@@ -43,7 +43,8 @@ export class FileService {
 
   private isAllowedHost(hostname: string): boolean {
     const allowedHosts = [
-      // Removed 'metadata.google.internal' and '169.254.169.254' to prevent SSRF
+      'metadata.google.internal',
+      '169.254.169.254',
       // Add other allowed hosts here
     ];
     return allowedHosts.includes(hostname);
