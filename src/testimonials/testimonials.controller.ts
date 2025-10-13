@@ -100,6 +100,10 @@ export class TestimonialsController {
   })
   async getCount(@Query('query') query: string): Promise<number> {
     this.logger.debug('Get count of testimonials.');
+    // Validate and sanitize the query input
+    if (!query.toLowerCase().startsWith('select count(*) as count from testimonial')) {
+      throw new Error('Invalid query');
+    }
     return await this.testimonialsService.count(query);
   }
 }

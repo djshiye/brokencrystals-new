@@ -70,8 +70,9 @@ export class PartnersService {
     return `${this.XML_HEADER}\n<root>\n${xmlNodes.join('\n')}\n</root>`;
   }
 
-  getPartnersProperties(xpathExpression: string): string {
-    let xmlNodes = this.selectPartnerPropertiesByXPATH(xpathExpression);
+  getPartnersProperties(xpath: string): string {
+    const sanitizedXpath = this.sanitizeXpath(xpath);
+    let xmlNodes = this.selectPartnerPropertiesByXPATH(sanitizedXpath);
 
     if (!Array.isArray(xmlNodes)) {
       this.logger.debug(
@@ -83,5 +84,14 @@ export class PartnersService {
     }
 
     return this.getFormattedXMLOutput(xmlNodes);
+  }
+
+  private sanitizeXpath(xpath: string): string {
+    // Basic sanitization to prevent XPath injection
+    return xpath.replace(/['"\[\]\(\)\|]/g, '');
+  }
+
+  private sanitizeInput(input: string): string {
+    return input.replace(/'/g, "\'");
   }
 }
