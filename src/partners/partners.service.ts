@@ -63,7 +63,9 @@ export class PartnersService {
     xpathExpression: string
   ): SelectReturnType {
     const partnersXMLObj = this.getPartnersXMLObj();
-    return xpath.select(xpathExpression, partnersXMLObj);
+    // Escape single quotes in the XPath expression to prevent injection
+    const sanitizedXPathExpression = xpathExpression.replace(/'/g, "\'");
+    return xpath.select(sanitizedXPathExpression, partnersXMLObj);
   }
 
   private getFormattedXMLOutput(xmlNodes): string {
