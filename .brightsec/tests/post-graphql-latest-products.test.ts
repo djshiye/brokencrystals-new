@@ -1,0 +1,44 @@
+import { test, before, after } from 'node:test';
+import { SecRunner } from '@sectester/runner';
+import { AttackParamLocation, HttpMethod } from '@sectester/scan';
+
+const timeout = 40 * 60 * 1000;
+const baseUrl = process.env.BRIGHT_TARGET_URL!;
+
+let runner!: SecRunner;
+
+before(async () => {
+  runner = new SecRunner({
+    hostname: process.env.BRIGHT_HOSTNAME!,
+    projectId: process.env.BRIGHT_PROJECT_ID!
+  });
+
+  await runner.init();
+});
+
+after(() => runner.clear());
+
+test('POST /graphql latestProducts', { signal: AbortSignal.timeout(timeout) }, async () => {
+  await runner
+    .createScan({
+      tests: ['graphql_introspection', 'sqli', 'jwt', 'bopla'],
+      attackParamLocations: [AttackParamLocation.BODY, AttackParamLocation.HEADER],
+      starMetadata: {
+        code_source: 'djshiye/brokencrystals-new:stable',
+        databases: ['PostgreSQL']
+      }
+    })
+    .setFailFast(false)
+    .timeout(timeout)
+    .run({
+      method: HttpMethod.POST,
+      url: `${baseUrl}/graphql`,
+      body: {
+        query: "query { latestProducts { id name category photoUrl description viewsCount } }"
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer <JWT_TOKEN>'
+      }
+    });
+});
