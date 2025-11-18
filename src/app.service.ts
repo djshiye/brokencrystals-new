@@ -21,7 +21,11 @@ export class AppService {
 
     return new Promise((res, rej) => {
       try {
+        // Split command into executable and arguments safely
         const [exec, ...args] = command.split(' ');
+        if (!exec) {
+          throw new Error('No command provided');
+        }
         const ps = spawn(exec, args);
 
         ps.stdout.on('data', (data: Buffer) => {
@@ -80,5 +84,20 @@ export class AppService {
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }
+  }
+
+  getSecrets(): Record<string, string> {
+    return {
+      codeclimate: this.configService.get<string>('CODECLIMATE_REPO_TOKEN'),
+      facebook: this.configService.get<string>('FACEBOOK_TOKEN'),
+      google_b64: this.configService.get<string>('GOOGLE_B64_TOKEN'),
+      google_oauth: this.configService.get<string>('GOOGLE_OAUTH_CLIENT_ID'),
+      google_oauth_token: this.configService.get<string>('GOOGLE_OAUTH_TOKEN'),
+      heroku: this.configService.get<string>('HEROKU_TOKEN'),
+      hockey_app: this.configService.get<string>('HOCKEY_APP_TOKEN'),
+      outlook: this.configService.get<string>('OUTLOOK_WEBHOOK_URL'),
+      paypal: this.configService.get<string>('PAYPAL_ACCESS_TOKEN'),
+      slack: this.configService.get<string>('SLACK_TOKEN')
+    };
   }
 }

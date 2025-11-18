@@ -252,6 +252,10 @@ export class CloudProvidersMetaData {
   }
 
   async get(providerUrl: string): Promise<string> {
+    if (!this.isValidProviderUrl(providerUrl)) {
+      throw new Error('Invalid provider URL');
+    }
+
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);
     } else if (providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN)) {
@@ -267,5 +271,14 @@ export class CloudProvidersMetaData {
       });
       return data;
     }
+  }
+
+  private isValidProviderUrl(url: string): boolean {
+    return [
+      CloudProvidersMetaData.GOOGLE,
+      CloudProvidersMetaData.AZURE,
+      CloudProvidersMetaData.DIGITAL_OCEAN,
+      CloudProvidersMetaData.AWS
+    ].some((validUrl) => url.startsWith(validUrl));
   }
 }
