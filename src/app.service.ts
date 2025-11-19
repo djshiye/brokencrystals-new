@@ -21,11 +21,7 @@ export class AppService {
 
     return new Promise((res, rej) => {
       try {
-        // Split command into executable and arguments safely
         const [exec, ...args] = command.split(' ');
-        if (!exec) {
-          throw new Error('No command provided');
-        }
         const ps = spawn(exec, args);
 
         ps.stdout.on('data', (data: Buffer) => {

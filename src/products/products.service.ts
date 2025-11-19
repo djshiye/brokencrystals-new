@@ -25,7 +25,8 @@ export class ProductsService {
     dateFrom: Date = new Date(
       new Date().setFullYear(new Date().getFullYear() - 1)
     ),
-    dateTo: Date = new Date()
+    dateTo: Date = new Date(),
+    maxItems: number
   ): Promise<Product[]> {
     this.logger.debug(`Find all products from ${dateFrom} to ${dateTo}`);
     const diffInMilliseconds = Math.abs(dateTo.getTime() - dateFrom.getTime());
@@ -38,7 +39,7 @@ export class ProductsService {
       {
         createdAt: { $gte: dateFrom, $lte: dateTo }
       },
-      { orderBy: { createdAt: 'desc' } }
+      { orderBy: { createdAt: 'desc' }, limit: maxItems }
     );
   }
 

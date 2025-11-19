@@ -85,7 +85,8 @@ export class ProductsController {
       throw new BadRequestException('Invalid date format');
     }
 
-    const allProducts = await this.productsService.findAll(df, dt);
+    const maxItems = 100; // Set a maximum number of items to prevent excessive data retrieval
+    const allProducts = await this.productsService.findAll(df, dt, maxItems);
     return allProducts.map((p: Product) => new ProductDto(p));
   }
 
