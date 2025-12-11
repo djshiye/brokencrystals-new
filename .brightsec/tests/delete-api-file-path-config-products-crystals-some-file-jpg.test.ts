@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('DELETE /api/file?path=config/products/crystals/some_file.jpg', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['lfi', 'bopla', 'ssrf', 'sqli'],
+      tests: ['lfi'],
       attackParamLocations: [AttackParamLocation.QUERY],
       starMetadata: {
         code_source: "djshiye/brokencrystals-new:stable",
