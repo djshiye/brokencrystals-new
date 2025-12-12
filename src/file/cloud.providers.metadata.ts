@@ -252,6 +252,18 @@ export class CloudProvidersMetaData {
   }
 
   async get(providerUrl: string): Promise<string> {
+    // Validate URL to prevent SSRF
+    const url = new URL(providerUrl);
+    if (!['https:', 'http:'].includes(url.protocol)) {
+      throw new Error('Invalid URL protocol');
+    }
+
+    // Allow only specific hostnames
+    const allowedHosts = ['metadata.google.internal', '169.254.169.254'];
+    if (!allowedHosts.includes(url.hostname)) {
+      throw new Error('Hostname not allowed');
+    }
+
     if (providerUrl.startsWith(CloudProvidersMetaData.GOOGLE)) {
       return this.providers.get(CloudProvidersMetaData.GOOGLE);
     } else if (providerUrl.startsWith(CloudProvidersMetaData.DIGITAL_OCEAN)) {

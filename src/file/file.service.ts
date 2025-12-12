@@ -10,8 +10,21 @@ export class FileService {
   private readonly logger = new Logger(FileService.name);
   private cloudProviders = new CloudProvidersMetaData();
 
+  private isValidPath(filePath: string): boolean {
+    // Define a list of allowed directories
+    const allowedDirectories = ['config/products/crystals'];
+    const resolvedPath = path.resolve(process.cwd(), filePath);
+
+    // Check if the resolved path starts with any of the allowed directories
+    return allowedDirectories.some(dir => resolvedPath.startsWith(path.resolve(process.cwd(), dir)));
+  }
+
   async getFile(file: string): Promise<Stream> {
     this.logger.log(`Reading file: ${file}`);
+
+    if (!this.isValidPath(file)) {
+      throw new Error('Access to this file path is not allowed');
+    }
 
     if (file.startsWith('/')) {
       await fs.promises.access(file, R_OK);
@@ -35,6 +48,10 @@ export class FileService {
   }
 
   async deleteFile(file: string): Promise<boolean> {
+    if (!this.isValidPath(file)) {
+      throw new Error('Access to this file path is not allowed');
+    }
+
     if (file.startsWith('/')) {
       throw new Error('cannot delete file from this location');
     } else if (file.startsWith('http')) {
