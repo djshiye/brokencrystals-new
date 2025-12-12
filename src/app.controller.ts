@@ -87,6 +87,10 @@ export class AppController {
   })
   @Redirect()
   async redirect(@Query('url') url: string) {
+    const allowedUrls = ['https://google.com', 'https://example.com']; // Add allowed URLs here
+    if (!allowedUrls.includes(url)) {
+      throw new HttpException('Invalid redirect URL', HttpStatus.BAD_REQUEST);
+    }
     return { url };
   }
 
@@ -152,10 +156,8 @@ export class AppController {
     try {
       return await this.appService.launchCommand(command);
     } catch (err) {
-      throw new InternalServerErrorException({
-        error: err.message || err,
-        location: __filename
-      });
+      this.logger.error('Error executing command', err.stack);
+      throw new InternalServerErrorException('An error occurred while processing your request.');
     }
   }
 
