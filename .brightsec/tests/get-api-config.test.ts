@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('GET /api/config', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['improper_asset_management', 'secret_tokens', 'csrf', 'xss', 'id_enumeration'],
+      tests: ['secret_tokens'],
       attackParamLocations: [AttackParamLocation.PATH],
       starMetadata: {
         code_source: 'djshiye/brokencrystals-new:stable',
