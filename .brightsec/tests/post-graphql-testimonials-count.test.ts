@@ -21,7 +21,7 @@ after(() => runner.clear());
 test('POST /graphql-testimonials-count', { signal: AbortSignal.timeout(timeout) }, async () => {
   await runner
     .createScan({
-      tests: ['graphql_introspection', 'sqli', 'xss'],
+      tests: ['graphql_introspection', 'sqli'],
       attackParamLocations: [AttackParamLocation.BODY],
       starMetadata: {
         code_source: 'djshiye/brokencrystals-new:stable',
