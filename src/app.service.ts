@@ -21,7 +21,14 @@ export class AppService {
 
     return new Promise((res, rej) => {
       try {
+        // Split the command into executable and arguments
         const [exec, ...args] = command.split(' ');
+
+        // Validate the command to prevent injection
+        if (!this.isValidCommand(exec, args)) {
+          throw new Error('Invalid command');
+        }
+
         const ps = spawn(exec, args);
 
         ps.stdout.on('data', (data: Buffer) => {
@@ -45,6 +52,20 @@ export class AppService {
     });
   }
 
+  // Function to validate the command and arguments
+  private isValidCommand(exec: string, args: string[]): boolean {
+    // Define a list of allowed commands
+    const allowedCommands = ['ls', 'echo'];
+
+    // Check if the command is in the allowed list
+    if (!allowedCommands.includes(exec)) {
+      return false;
+    }
+
+    // Further validation on arguments can be added here
+    return true;
+  }
+
   getConfig(): AppConfig {
     const dbSchema = this.configService.get<string>(
         OrmModuleConfigProperties.ENV_DATABASE_SCHEMA
@@ -66,7 +87,7 @@ export class AppService {
       awsBucket: this.configService.get<string>(
         AppModuleConfigProperties.ENV_AWS_BUCKET
       ),
-      sql: `postgres://${dbUser}:${dbPwd}@${dbHost}:${dbPort}/${dbSchema} `,
+      sql: `postgres://${dbUser}:${dbPwd}@${dbHost}:${dbPort}/${dbSchema}`,
       googlemaps: this.configService.get<string>(
         AppModuleConfigProperties.ENV_GOOGLE_MAPS
       )

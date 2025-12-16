@@ -32,6 +32,7 @@ import {
   SWAGGER_DESC_SAVE_RAW_CONTENT
 } from './file.controller.swagger.desc';
 import { CloudProvidersMetaData } from './cloud.providers.metadata';
+import { URL } from 'url';
 
 @Controller('/api/file')
 @ApiTags('Files controller')
@@ -50,7 +51,7 @@ export class FileController {
 
   private async loadCPFile(cpBaseUrl: string, path: string) {
     if (!path.startsWith(cpBaseUrl)) {
-      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+      throw new BadRequestException(`Invalid parameter 'path' ${path}`);
     }
 
     const file: Stream = await this.fileService.getFile(path);
@@ -82,15 +83,28 @@ export class FileController {
     description: SWAGGER_DESC_READ_FILE
   })
   async loadFile(
-    @Query('path') path: string,
+    @Query('path') filePath: string,
     @Query('type') contentType: string,
     @Res({ passthrough: true }) res: FastifyReply
   ) {
-    const file: Stream = await this.fileService.getFile(path);
-    const type = this.getContentType(contentType);
-    res.type(type);
+    try {
+      // Validate the file path to prevent directory traversal
+      const basePath = path.resolve('config/products/crystals');
+      const resolvedPath = path.resolve(basePath, filePath);
 
-    return file;
+      if (!resolvedPath.startsWith(basePath)) {
+        throw new BadRequestException(`Invalid parameter 'path' ${filePath}`);
+      }
+
+      const file: Stream = await this.fileService.getFile(resolvedPath);
+      const type = this.getContentType(contentType);
+      res.type(type);
+
+      return file;
+    } catch (err) {
+      this.logger.error(err.message);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: 'An error occurred while processing your request.' });
+    }
   }
 
   @Get('/google')
@@ -159,6 +173,9 @@ export class FileController {
     @Query('type') contentType: string,
     @Res({ passthrough: true }) res: FastifyReply
   ) {
+    if (!path.startsWith(CloudProvidersMetaData.AWS)) {
+      throw new BadRequestException(`Invalid parameter 'path' ${path}`);
+    }
     const file: Stream = await this.loadCPFile(
       CloudProvidersMetaData.AWS,
       path
@@ -197,6 +214,15 @@ export class FileController {
     @Query('type') contentType: string,
     @Res({ passthrough: true }) res: FastifyReply
   ) {
+    try {
+      const url = new URL(path);
+      if (url.hostname !== 'valid.azure.domain') {
+        throw new BadRequestException(`Invalid parameter 'path' ${path}`);
+      }
+    } catch (error) {
+      throw new BadRequestException(`Invalid URL format for 'path' ${path}`);
+    }
+
     const file: Stream = await this.loadCPFile(
       CloudProvidersMetaData.AZURE,
       path
